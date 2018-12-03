@@ -1,0 +1,171 @@
+
+.pull-left{
+  float: left !important;
+}
+.pull-right{
+  float: right !important;
+}
+
+.clearfix{
+  &:before,
+  &:after{
+    content: '';
+    display: table;
+  }
+
+  &:after{
+    clear: both;
+  }
+}
+
+.imgicon{
+  position: relative;
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  vertical-align: middle;
+}
+
+.input-placeholder,
+.textarea-placeholder{
+  color: #CBCBCB;
+}
+
+.pr{
+  position: relative;
+}
+
+.block{
+  display: block !important;
+}
+
+.l{
+  border:1px solid red;
+}
+.none{
+  display:none !important;
+}
+
+.game-list{
+  .game-item{
+    position: relative;
+    border-bottom: 1px solid @uiBorderColor;
+    display:flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color:@weuiBgColorWhite;
+    padding-left:@dl;
+    padding-right:@dl;
+    height: 135rpx;
+
+    image{
+      width: 90rpx;
+      height: 90rpx;
+      border-radius: @borderRadius;
+    }
+
+    .game-content{
+      width: 435rpx;
+      .game-title{
+        display: flex;
+        justify-content: flex-start;
+      }
+      .h4{
+        font-weight: 600;
+        margin-right: @dsm;
+        .text-ellipsis();
+      }
+      .h5{
+        margin-left: @dl;
+        color:@uiColorBlue;
+      }
+    }
+
+    .game-des{
+      width: 90%;
+      margin-top: @dsm;
+      color:@textColorLight;
+      .text-ellipsis();
+    }
+
+
+    .game-btn{
+      width: 115rpx;
+      height: 55rpx;
+      line-height: 55rpx;
+      text-align:center;
+      border-radius: @borderRadius;
+      background-color:@weuiColorPrimary;
+      color:white;
+      font-size:25rpx;
+    }
+  }
+}
+
+.section{
+  margin-top: @dl;
+  background-color: @weuiBgColorWhite;
+  .section-header{
+    display:flex;
+    justify-content: space-between;
+    height: 70rpx;
+    line-height: 70rpx;
+    padding-left:@d;
+    padding-right:@d;
+    border-bottom:1px solid @uiBorderColor;
+    .section-title{
+      font-weight: 800;
+      .h4;
+    }
+    navigator{
+      font-weight: 800;
+      color:#C04F58;
+    }
+  }
+  .section-content{
+    padding-bottom:@dl;
+    display:flex;
+    flex-wrap:nowrap;
+  }
+  .section-item{
+    height: 150rpx;
+    position: relative;
+    width: 150rpx;
+    text-align:center;
+    padding-top:@dl;
+    image{
+      width: 100rpx;
+      height: 100rpx;
+      border-radius: @borderRadius;
+    }
+    text{
+      display:block;
+      .text-ellipsis();
+    }
+  }
+
+  &.recommend{//推荐
+    .section-item{
+      width: 187rpx;
+    }
+
+    .section-content{
+      flex-wrap:wrap;
+    }
+
+    .section-footer{
+      padding:@dl;
+    }
+  }
+}
+
+.footer-container{
+  width: 100%;
+  padding:@dl;
+  background-color:@weuiBgColorDefault;
+  text-align: center;
+}
+
+.hidden{
+  display:none;
+}

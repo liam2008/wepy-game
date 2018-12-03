@@ -1,0 +1,423 @@
+<style lang="less">
+  @import "../styles/custom/fn.less";
+
+  @keyframes swing {
+    25% {
+      transform: rotate(45deg);
+    }
+    50% {
+      transform: rotate(0deg);
+    }
+    75% {
+      transform: rotate(-45deg);
+    }
+    100% {
+      transform: rotate(0deg);
+    }
+  }
+
+  @keyframes scale { /*定义关键帧、scaleDrew是需要绑定到选择器的关键帧名称*/
+    25% {
+      transform: scale(1.1);
+    }
+    50% {
+      transform: scale(1);
+    }
+    75% {
+      transform: scale(0.9);
+    }
+    100% {
+      transform: scale(1);
+    }
+  }
+
+  .swiper-container {
+    position: relative;
+    z-index: 1;
+  }
+
+  //摆动
+  .swing-container {
+    position: absolute;
+    right: 110rpx;
+    top: 0;
+    z-index: 30;
+    animation: swing 2.8s 0.15s linear infinite;
+    transform-origin: 50% 0;
+    .swing-icon {
+      width: 100rpx;
+      height: 160rpx;
+    }
+  }
+
+  .slide-image {
+    width: 750rpx;
+    height: 300rpx;
+  }
+
+  .search-container {
+    margin-top: @dl;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: @weuiBgColorWhite;
+    height: 110rpx;
+
+    input {
+      width: 500rpx;
+      height: 60rpx;
+      border-radius: 30rpx;
+      padding-left: 40rpx;
+      padding-right: 40rpx;
+      background-color: @weuiBgColorDefault;
+    }
+    .search-btn {
+      display: block;
+      text-align: center;
+      line-height: 55rpx;
+      width: 100rpx;
+      height: 55rpx;
+      color: #999;
+      i {
+        font-size: 60rpx;
+      }
+    }
+  }
+
+  .modal {
+    display: none;
+    position: fixed;
+    z-index: 100;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    .modal-content {
+      position: relative;
+      z-index: 100;
+      background-color: @weuiBgColorWhite;
+      border-radius: @borderRadius;
+      width: 60%;
+      margin: 8%;
+      padding: 0 10% 5% 10%;
+    }
+    text {
+      color: red;
+    }
+    .icon-dot {
+      .h1();
+      color: @textColorLight;
+      margin-left: @d;
+    }
+    .point {
+      animation: scale 2s 0.15s linear infinite;
+      position: absolute;
+      z-index: 1000;
+      right: 0;
+      top: -55rpx;
+      width: 110rpx;
+      height: 110rpx;
+    }
+    &.show {
+      display: block;
+    }
+  }
+
+  .last .section-item {
+    width: 20%;
+  }
+</style>
+
+<template>
+  <view class="container">
+    <view style="position:relative;">
+      <view class="swing-container" @tap="collect">
+        <image model="aspectFit" src="../images/category/game.png" class="swing-icon"></image>
+      </view>
+      <swiper class="swiper-container" autoplay="true">
+        <repeat for="{{bannerList}}" key="index" index="index" item="item">
+          <swiper-item class="pr"
+                       @tap="contact('{{item.title}}','{{item.description}}','{{item.image}}','{{item.diyname}}', '{{item.tags}}','{{item.id}}')">
+            <image src="{{item.image}}" class="slide-image"/>
+          </swiper-item>
+        </repeat>
+      </swiper>
+    </view>
+
+    <view class="search-container">
+      <input id="search" type="text" @focus="search" placeholder="输入你要搜索的游戏名称"/>
+      <view class="search-btn" @tap="search"><i class="iconfont icon-search"></i></view>
+    </view>
+
+    <block wx:if="{{lasts.length}}">
+      <view class="section last">
+        <view class="section-header">
+          <text class="section-title">最近玩过的</text>
+        </view>
+        <view class="section-content">
+          <repeat for="{{showLasts}}" key="index" index="index" item="item">
+            <view class="section-item"
+                  @tap="contact('{{item.title}}','{{item.description}}','{{item.img}}','{{item.diyname}}','{{item.tags}}','{{item.game_id}}')">
+              <image class="item-img" src="{{item.img}}"></image>
+              <text class="h5">{{item.title}}</text>
+            </view>
+          </repeat>
+        </view>
+      </view>
+    </block>
+
+    <view class="section recommend">
+      <view class="section-header">
+        <text class="section-title">热门网游推荐</text>
+        <navigator url="/pages/hot" open-type="switchTab">
+          更多热门 >>
+        </navigator>
+      </view>
+      <view class="section-content">
+        <repeat for="{{popularList}}" key="index" index="index" item="item">
+          <view class="section-item"
+                @tap="contact('{{item.title}}','{{item.description}}','{{item.image}}','{{item.diyname}}','{{item.tags}}','{{item.id}}')">
+            <view>
+              <image class="item-img" src="{{item.image}}"></image>
+              <text class="h5">{{item.title}}</text>
+            </view>
+          </view>
+        </repeat>
+      </view>
+      <!--<view class="section-footer">-->
+      <!--<button plain="true" class="weui-btn {{isMore ? 'hidden' : '' }}" type="default" @tap="more">更多</button>-->
+      <!--</view>-->
+    </view>
+
+    <view class="section">
+      <view class="section-header">
+        <text class="section-title">最新游戏</text>
+      </view>
+      <view class="game-list">
+        <repeat for="{{archivesList}}" key="index" index="index" item="item">
+          <view class="game-item"
+                @tap="contact({{item.title}}, {{item.description}}, {{item.image}}, {{item.diyname}}, {{item.tags}}, {{item.id}})">
+            <image mode="aspectFill" src="{{item.image}}"></image>
+            <view class="game-content">
+              <view class="game-title">
+                <text class="h4">{{item.title}}</text>
+                <text class="h5">{{item.tags}}</text>
+              </view>
+              <view class="game-des">{{item.description}}</view>
+            </view>
+            <view class="game-btn">
+              进入
+            </view>
+          </view>
+        </repeat>
+      </view>
+    </view>
+
+    <button class="share-icon" data-name="shareBtn" open-type="share">
+      <i class="iconfont icon-share"></i>
+      <text>分享</text>
+    </button>
+
+
+  </view>
+
+  <view class="footer-container">
+    更多游戏请关注公众号【53游戏】
+  </view>
+
+  <view class="modal {{isShow?'show':' '}}" @tap="collect">
+    <view class="modal-content">
+      <image class="point" mode="aspectFit" src="../images/icon/point.png"></image>
+      <view class="text">
+        <view>1、点击右上角 <i class="iconfont icon-dot"></i></view>
+        <view> 2、点击
+          <text>【添加到我的小程序】</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <Modal :visible.sync="modalVisible" :img.sync="modalImg" :showCancel.sync="showCancel">
+    <view slot="body">{{modalDes}}</view>
+  </Modal>
+
+</template>
+
+<script>
+  import wepy from 'wepy'
+  import {service} from '../api/api'
+  import base from '../mixins/base'
+  import http from '../mixins/http'
+  import tip from '../mixins/tip'
+  import user from '../mixins/user'
+  import Modal from '../components/modal'
+
+  export default class Index extends wepy.page {
+    mixins = [base, http, tip, user]
+    config = {
+      navigationBarTitleText: '大厅'
+    }
+
+    data = {
+      isShow: false,
+      isRemindShow: false,
+      // isMore: false,
+      bannerList: [],
+      archivesList: [],
+      news: [],
+      lasts: [],
+      popularList: [],
+      modalVisible: false,
+      showCancel: false,
+      modalImg: '',
+      modalDes: ''
+    }
+
+    computed = {
+      showLasts() {
+        return this.lasts.length ? this.lasts.slice(0, 5) : null
+      }
+    }
+
+    methods = {
+      search() {
+        wepy.navigateTo({
+          url: 'search'
+        })
+      },
+      collect() {
+        this.isShow = !this.isShow
+      },
+      share() {
+        wepy.showShareMenu({
+          withShareTicket: true
+        })
+      },
+      contact(name, description, img, path, tags, gameId) {
+        let self = this
+        this.modalVisible = true
+        this.modalImg = img
+        this.modalDes = description
+        console.log('modal', this.modalImg)
+        wepy.getStorage({
+          key: 'session',
+          success(res) {
+            let sessionId = res.data
+            self.$post({url: service.contact, data: {name, description, img, path, sessionId, tags, gameId}}, {
+              complete: (res) => {
+                if (res.data.code === 1) {
+                }
+              }
+            })
+          }
+        })
+      }
+      /*more() {
+        this.popularList = this.archivesList
+        this.isMore = !this.isMore
+      }*/
+    }
+
+    components = {
+      Modal
+    }
+
+    onLoad() {
+      //判断是否屏蔽
+      let self = this
+      this.$get({url: service.isOpen}, {
+        complete(res) {
+          let newVersion = res.data.data
+          let oldVersion = self.$parent.globalData.version
+
+          if (newVersion === oldVersion) {
+            wepy.navigateTo({url: '/pages/unauthorize'})
+          } else {
+            self.login()
+          }
+        }
+      })
+    }
+
+    onShow() {
+      this.last()
+    }
+
+    initData() {
+      this.$get({url: service.bannerList}, {
+        success: ({code, data}) => {
+          this.bannerList = data.bannerList
+        },
+        fail: ({code, data}) => {
+          // 失败了什么也不做
+        }
+      })
+
+      this.$get({url: service.popular}, {
+        success: ({code, data}) => {
+          this.archivesList = data.archivesList.archivesList
+          if (data.archivesList.archivesList.length > 8) {
+            this.popularList = data.archivesList.archivesList.slice(0, 8)
+          } else {
+            this.popularList = data.archivesList.archivesList
+          }
+        },
+        fail: ({code, data}) => {
+          // 失败了什么也不做
+        }
+      })
+
+      this.$get({url: service.news}, {
+        success: ({code, data}) => {
+          this.news = data.archivesList.archivesList
+        },
+        fail: ({code, data}) => {
+          // 失败了什么也不做
+        }
+      })
+    }
+
+    last() {
+      let self = this
+      wepy.getStorage({
+        key: 'session',
+        success(res) {
+          let sessionId = res.data
+          self.$post({url: service.last, data: {sessionId}}, {
+            success: ({code, data}) => {
+              self.lasts = data
+            },
+            fail: ({code, data}) => {
+              // 失败了什么也不做
+            }
+          })
+        }
+      })
+    }
+
+    login() {
+      let self = this
+      this.$login((res) => {
+        if (res.code) {
+          self.$post({url: service.login, data: {code: res.code}}, {
+            success: ({code, data}) => {
+              let session = data.sessionId
+              self.initData()
+              try {
+                wepy.setStorageSync('session', session)
+              } catch (e) {
+                console.error(e)
+              }
+            },
+            fail: ({code, data}) => {
+              self.error('登录失败！')
+            }
+          })
+        } else {
+          self.error('登录失败！')
+        }
+      })
+    }
+  }
+</script>

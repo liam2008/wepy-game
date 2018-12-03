@@ -1,0 +1,53 @@
+<style type="less">
+  @import "../styles/custom/fn.less";
+
+</style>
+
+<template>
+  <view class="weui-search-bar">
+  </view>
+</template>
+
+<script>
+  import wepy from 'wepy'
+  // import { service } from '../api.js'
+  import base from '../mixins/base'
+
+  export default class SearchBar extends wepy.component {
+    mixins = [base]
+    props = {
+      placeholder: {
+        type: String,
+        default: '搜索'
+      }
+    }
+
+    data = {
+      inputShowed: false,
+      inputVal: ''
+    }
+
+    computed = {
+      style_width() {
+        /*const col = this.col
+        return this.getPercent(1 / this.getNumber(col, 4))*/
+      }
+    }
+
+    methods = {
+      showInput (isShow) {
+        this.inputShowed = isShow === 'true'
+        this.$apply()
+      }
+    }
+
+    events = {
+      'index-broadcast': (...args) => {
+      }
+    }
+
+    onLoad () {
+    }
+  }
+
+</script>

@@ -1,0 +1,143 @@
+<style lang="less">
+  @import "../styles/custom/fn.less";
+  page{
+    background-color: @weuiBgColorWhite;
+  }
+  .search-container{
+    border-bottom:1px solid @uiBorderColor;
+    display:flex;
+    justify-content: center;
+    align-items: center;
+    background-color: @weuiBgColorWhite;
+    height: 110rpx;
+
+    input{
+      width: 500rpx;
+      height: 60rpx;
+      border-radius:30rpx;
+      padding-left:40rpx;
+      padding-right:40rpx;
+      background-color: @weuiBgColorDefault;
+    }
+    .search-btn {
+      display:block;
+      text-align:center;
+      line-height: 55rpx;
+      width: 100rpx;
+      height: 55rpx;
+      color:#999;
+      i{
+        font-size:60rpx;
+      }
+    }
+  }
+</style>
+
+<template>
+  <view class="container">
+    <view class="search-container">
+      <input id="search"
+             value="{{searchContent}}"
+             type="text"
+             placeholder="输入你要搜索的游戏名称"
+             @input="inputTyping"
+      />
+      <view class="search-btn" @tap="search"><i class="iconfont icon-search"></i></view>
+    </view>
+
+    <view class="game-list">
+      <repeat for="{{archivesList}}" key="index" index="index" item="item">
+        <view  class="game-item" @tap="contact({{item.title}}, {{item.description}}, {{item.image}}, {{item.diyname}}, {{item.tags}}, {{item.id}})">
+          <image mode="aspectFill" src="{{item.image}}"></image>
+          <view class="game-content">
+            <view class="game-title">
+              <text class="h4">{{item.title}}</text>
+              <text class="h5">{{item.tags}}</text>
+            </view>
+            <view class="game-des">{{item.description}}</view>
+          </view>
+          <view class="game-btn">
+            进入
+          </view>
+        </view>
+      </repeat>
+    </view>
+  </view>
+
+  <Modal :visible.sync="modalVisible" :img.sync="modalImg" :showCancel.sync="showCancel">
+    <view slot="body">{{modalDes}}</view>
+  </Modal>
+</template>
+
+<script>
+  import wepy from 'wepy'
+  import {service} from '../api/api'
+  import base from '../mixins/base'
+  import http from '../mixins/http'
+  import tip from '../mixins/tip'
+  import Modal from '../components/modal'
+
+  export default class Index extends wepy.page {
+    mixins = [base, http, tip]
+    config = {
+      navigationBarTitleText: '搜索'
+    }
+
+    data = {
+      archivesList: [],
+      searchContent: '',
+      showCancel: false,
+      modalVisible: false,
+      modalImg: '',
+      modalDes: ''
+    }
+
+    methods = {
+      search() {
+        this.searchData()
+      },
+      inputTyping(e) {
+        this.searchContent = e.detail.value
+      },
+      contact(name, description, img, path, sessionId, tags, gameId) {
+        let self = this
+        this.modalVisible = true
+        this.modalImg = img
+        this.modalDes = description
+        wepy.getStorage({
+          key: 'session',
+          success (res) {
+            let sessionId = res.data
+            self.$post({url: service.contact, data: {name, description, img, path, sessionId}}, {
+              complete: (res) => {
+                if (res.data.code === 1) {
+                  self.modalVisible = true
+                }
+              }
+            })
+          }
+        })
+      }
+    }
+
+    components = {
+      Modal
+    }
+
+    onLoad() {
+      this.searchData()
+    }
+
+    searchData() {
+      let self = this
+      this.$post({url: service.search, data: {search: this.searchContent}}, {
+        success: ({code, data}) => {
+          this.archivesList = data
+        },
+        fail: ({code, data}) => {
+          self.alert('服务器错误')
+        }
+      })
+    }
+  }
+</script>

@@ -1,0 +1,62 @@
+@uiBtnColor-primary: #33bdfe;
+@uiBtnColor-default: #F6F6F6;
+
+button[type="primary"] {
+  border:none;
+  color: white;
+  background-color: @uiBtnColor-primary;
+}
+[type="primary"].button-hover {
+  background-color: darken(@uiBtnColor-primary, 10%);
+}
+button[disabled][type="primary"] {
+  background-color: lighten(@uiBtnColor-primary, 20%);
+}
+
+button[type="primary"][plain] {
+  color:@uiBtnColor-primary;
+  border-color:@uiBtnColor-primary;
+  background-color:transparent;
+}
+[type="primary"][plain].button-hover {
+  color: darken(@uiBtnColor-primary, 10%);
+  border-color: darken(@uiBtnColor-primary, 10%);
+}
+
+
+button[type="default"] {
+  border:none;
+  color: black;
+  background-color: @uiBtnColor-default;
+  &:after{display: none;}
+}
+[type="default"].button-hover {
+  color: darken(@uiBtnColor-default, 5%);
+}
+button[disabled][type="default"] {
+  color: fade(@uiBtnColor-primary, 60%);
+}
+
+button[size="mini"] {
+  .h4();
+  padding: 0 1.4em;
+}
+
+button.btn-block{
+  border-radius: 0;
+}
+
+.navigatorBtn{
+   position: absolute;
+   top:0;
+   bottom:0;
+   left:0;
+   right:0;
+   border-radius:0;
+   padding:0;
+   opacity: 0;
+ }
+
+.contactBtn{
+  visibility: hidden;
+}

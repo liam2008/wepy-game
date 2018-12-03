@@ -1,0 +1,78 @@
+<style lang="less">
+  @import "../styles/custom/fn.less";
+  page{
+    background: #fff;
+  }
+  .img-list{
+    padding:@dl;
+    display:flex;
+    flex-direction: column;
+    justify-content: space-between;
+    .img{
+      width: 100%;
+      height: 300rpx;
+      border-radius:30rpx;
+      overflow: hidden;
+      margin-bottom: @dl;
+    }
+    image{
+      width: 100%;
+    }
+  }
+
+  .footer-container{
+    margin-top: 380rpx;
+    background-color: white !important;
+  }
+
+</style>
+
+<template>
+  <view class="container">
+    <view class="img-list">
+      <navigator class="img" app-id="wx79ade44c39cefc7f" path="?chid=2041&subchid=hzcqll" target="miniProgram">
+        <image mode="aspectFill" src="http://www.53fun.com/Uploads/Picture/2018-11-13/5bea93ffa6f76.gif"></image>
+      </navigator>
+
+      <navigator class="img" app-id="wx79ade44c39cefc7f" path="?chid=2041&subchid=hzcqll">
+        <image mode="aspectFill" src="http://www.53fun.com/Uploads/Picture/2018-11-13/5bea93ffa6f76.gif"></image>
+      </navigator>
+    </view>
+
+    <view class="footer-container">
+      更多游戏请关注公众号【53游戏】
+    </view>
+  </view>
+</template>
+
+<script>
+  import wepy from 'wepy'
+
+  export default class Index extends wepy.page {
+    mixins = []
+    config = {
+      navigationBarTitleText: '预览'
+    }
+
+    data = {
+
+    }
+
+    computed = {
+    }
+
+    methods = {
+
+    }
+
+    events = {
+    }
+
+    components = {
+      // BookList
+    }
+
+    onLoad() {
+    }
+  }
+</script>

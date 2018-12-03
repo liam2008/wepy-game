@@ -1,0 +1,246 @@
+<style lang="less">
+  @import "../styles/custom/fn.less";
+  .h-modal {
+    position: fixed;
+    overflow: hidden;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    height: 100%;
+    z-index: 999;
+    transform: translateZ(1px);
+    opacity: 0;
+    visibility: hidden;
+    &-show {
+      visibility: visible;
+      opacity: 1;
+    }
+
+    &-mask {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.7);
+      z-index: 999;
+      transition: all .5s ease-in-out;
+      opacity: 0;
+      visibility: hidden;
+
+      &-show {
+        opacity: 1;
+        visibility: visible;
+      }
+    }
+
+    &-main {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      height: auto;
+      position: relative;
+      margin-top: 50%;
+      z-index: 1000;
+    }
+
+    &-content {
+      border-radius: ~"10rpx";
+      padding-top: 15px;
+      position: relative;
+      background-color: #fff;
+      border: 0;
+      background-clip: padding-box;
+      text-align: center;
+      width: ~"540rpx";
+      height: auto;
+
+      .h-modal-img{
+        width: ~"100rpx";
+        height: ~"100rpx";
+      }
+    }
+
+    &-close{
+      position: absolute;
+      right: ~"-28rpx";
+      top: ~"-28rpx";
+      width: ~"60rpx";
+      height: ~"60rpx";
+      border-radius: 50%;
+    }
+
+    &-body {
+      max-height: 100px;
+      padding: 5px 15px;
+      font-size: 14px;
+      height: 100%;
+      line-height: 1.5;
+      overflow: auto;
+    }
+
+    &-title {
+      padding: 6px 15px 15px;
+      margin: 0;
+      font-size: ~"38rpx";
+      line-height: 1;
+      color: #333;
+      text-align: center;
+    }
+
+    &-actions {
+      display: flex;
+
+      &-item {
+        flex: 1;
+        padding: 10px 0;
+        border: ~"1rpx" solid #eee;
+      }
+      &-item {
+        border-right: none;
+      }
+      &.vertical {
+        flex-direction: column;
+      }
+      &.vertical > &-item {
+        border-bottom: none;
+      }
+    }
+
+    &-footer {
+      display: flex;
+      justify-content: center;
+      &-wrap {
+        display: inherit;
+        width: 100%;
+        padding:@dl;
+      }
+      &-item{
+        width: 100%;
+      }
+      &-des{
+        color: @uiColorGray;
+        margin-top: @d;
+        .h5();
+      }
+      &-ok {
+        width: 60%;
+      }
+      .red{
+        margin-left: @d;
+        color: red;
+      }
+    }
+  }
+</style>
+
+<template lang="wxml">
+  <view class="h-modal {{ visible ? 'h-modal-show' : '' }} {{ className ? className : ''}}">
+    <view class="h-modal-mask {{ visible ? 'h-modal-mask-show' : '' }}"></view>
+    <view class="h-modal-main">
+      <view class="h-modal-content">
+        <image class="h-modal-close" mode="aspectFill" src="../images/icon/close.jpg" @tap="handleClickCancel"></image>
+        <image mode="aspectFill" class="h-modal-img" mode="aspectFill" wx:if="{{ img }}" src="{{img}}"></image>
+        <view class="h-modal-body">
+          <slot name="body"></slot>
+        </view>
+        <view class="h-modal-actions {{ actionMode }}" wx:if="{{ actions.length }}">
+          <view class="h-modal-actions-item" wx:for="{{ actions }}" wx:key="{{ item.name }}">
+            <view class="h-modal-actions-item-wrap" @tap="handleClickItem({{ index }}, {{ item }})">
+              <view class="h-modal-btn-text" style="{{ item.color ? 'color: ' + item.color : '' }}">{{ item.name }}</view>
+            </view>
+          </view>
+        </view>
+        <view class="h-modal-footer" wx:else>
+          <view class="h-modal-footer-wrap"  wx:if="{{ showOk || showCancel }}">
+            <view class="h-modal-footer-item" @tap="handleClickCancel" wx:if="{{ showCancel }}">
+              <view class="h-modal-footer-cancel">{{ cancelTxt }}</view>
+            </view>
+            <view class="h-modal-footer-item" @tap="handleClickOk" wx:if="{{ showOk }}">
+              <button class="h-modal-footer-ok"
+                      type="primary"
+                      open-type="contact"
+                      contact="contact"
+                     session-from="weapp">
+                     进入后台回复 <text class="red">1</text>
+              </button>
+              <view class="h-modal-footer-des">即将开始游戏</view>
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+</template>
+
+<script>
+  import wepy from 'wepy'
+
+  export default class Modal extends wepy.component {
+    props = {
+      className: {
+        type: String,
+        default: ''
+      },
+      img: {
+        type: String,
+        default: ''
+      },
+      cancelTxt: {
+        type: String,
+        default: '取消'
+      },
+      showOk: {
+        type: Boolean,
+        default: true
+      },
+      showCancel: {
+        type: Boolean,
+        default: true
+      },
+      actionMode: {
+        type: String,
+        default: ''
+      },
+      actions: {
+        type: Array,
+        default: []
+      },
+      visible: {
+        type: Boolean,
+        default: false,
+        twoWay: true
+      }
+    }
+
+    data = {
+      visible: false,
+      title: '',
+      actionMode: ''
+    }
+
+    methods = {
+      showModal(params) {
+        this.visible = true
+        for (let val in params) {
+          this[val] = params[val]
+        }
+      },
+      handleClickItem(index, action) {
+        this.visible = false
+        this.$emit('onClickItem', index, action)
+      },
+      handleClickOk() {
+        this.visible = false
+        this.$emit('onClickOk')
+      },
+      handleClickCancel() {
+        this.visible = false
+        this.$emit('onClickCancel')
+      }
+    }
+  }
+</script>

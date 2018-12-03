@@ -1,0 +1,141 @@
+<style lang="less">
+  @import "../styles/custom/fn.less";
+
+  page {
+    background-color: @weuiBgColorWhite;
+  }
+
+  .weui-article__h3 {
+    padding-left: @d;
+    font-weight: bold;
+  }
+
+  .game-des{
+    width: 100%;
+  }
+
+  .game-server{
+    color: #C04F58;
+    margin-left: @dl;
+    .h5();
+  }
+
+  .game-list{
+    border-top: 1px solid @uiBorderColor;
+  }
+</style>
+
+<template>
+  <view class="container">
+    <view class="weui-article__section">
+      <view class="weui-article__h3">今日开服</view>
+      <view class="game-list">
+        <repeat for="{{game_today}}" key="index" index="index" item="item">
+          <view class="game-item"
+                @tap="contact({{item.game_name}}, {{item.introduction}}, {{item.path}}, {{item.diyname}}, {{item.game_type_name}}, {{item.game_id}})">
+            <image mode="aspectFill" src="{{item.path}}"></image>
+            <view class="game-content">
+              <view class="game-title">
+                <text class="h4">{{item.game_name}}</text>
+                <text class="h5">{{item.game_type_name}}</text>
+              </view>
+              <view class="game-des">
+                <text>{{item.time}}</text>
+                <text class="game-server">{{item.server_name}}</text>
+              </view>
+            </view>
+            <view class="game-btn">
+              进入
+            </view>
+          </view>
+        </repeat>
+      </view>
+    </view>
+
+    <view class="weui-article__section">
+      <view class="weui-article__h3">即将开服</view>
+      <view class="game-list">
+        <repeat for="{{game_torr}}" key="index" index="index" item="item">
+          <view class="game-item"
+                @tap="contact({{item.game_name}}, {{item.introduction}}, {{item.path}}, {{item.diyname}}, {{item.game_type_name}}, {{item.game_id}})">
+            <image mode="aspectFill" src="{{item.path}}"></image>
+            <view class="game-content">
+              <view class="game-title">
+                <text class="h4">{{item.game_name}}</text>
+                <text class="h5">{{item.game_type_name}}</text>
+              </view>
+              <view class="game-des">
+                <text>{{item.time}}</text>
+                <text class="game-server">{{item.server_name}}</text>
+              </view>
+            </view>
+            <view class="game-btn">
+              进入
+            </view>
+          </view>
+        </repeat>
+      </view>
+    </view>
+  </view>
+
+  <Modal :visible.sync="modalVisible" :img.sync="modalImg" :showCancel.sync="showCancel">
+    <view slot="body">{{modalDes}}</view>
+  </Modal>
+</template>
+
+<script>
+  import wepy from 'wepy'
+  import {service} from '../api/api'
+  import base from '../mixins/base'
+  import http from '../mixins/http'
+  import Modal from '../components/modal'
+
+  export default class Index extends wepy.page {
+    mixins = [base, http]
+    config = {
+      navigationBarTitleText: '开服'
+    }
+
+    data = {
+      game_today: [],
+      game_torr: [],
+      modalVisible: false,
+      showCancel: false,
+      modalImg: '',
+      modalDes: ''
+    }
+
+    methods = {
+      contact(name, description, img, path, tags, gameId) {
+        let self = this
+        this.modalVisible = true
+        this.modalImg = img
+        this.modalDes = description
+        wepy.getStorage({
+          key: 'session',
+          success(res) {
+            let sessionId = res.data
+            self.$post({url: service.contact, data: {name, description, img, path, sessionId, tags, gameId}}, {})
+          }
+        })
+      }
+    }
+
+    components = {
+      Modal
+    }
+
+    onLoad() {
+      this.initData()
+    }
+
+    initData() {
+      this.$get({url: service.openGame}, {
+        success: ({code, data}) => {
+          this.game_today = data.game_today
+          this.game_torr = data.game_torr
+        }
+      })
+    }
+  }
+</script>

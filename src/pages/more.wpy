@@ -1,0 +1,97 @@
+<style lang="less">
+  @import "../styles/custom/fn.less";
+  page{
+    background-color: @weuiBgColorWhite;
+  }
+  .container{
+    padding:30rpx 40rpx;
+  }
+  .more-list{
+    display:flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    .more-item{
+      border-radius: @borderRadius;
+      overflow: hidden;
+      margin-top: @dler;
+      width: 310rpx;
+      height: 124rpx;
+      image{
+        width: 100%;
+        height: 100%;
+      }
+    }
+  }
+</style>
+
+<template>
+  <view class="container">
+    <view class="more-list">
+      <repeat for="{{archivesList}}" key="index" index="index" item="item">
+        <view class="more-item"  @tap="contact({{item.title}}, {{item.description}}, {{item.image}}, {{item.diyname}}, {{item.tags}}, {{item.id}})">
+          <image mode="aspectFill" src="{{item.image}}"></image>
+        </view>
+      </repeat>
+    </view>
+  </view>
+
+
+  <Modal :visible.sync="modalVisible" :img.sync="modalImg" :showCancel.sync="showCancel">
+    <view slot="body">{{modalDes}}</view>
+  </Modal>
+</template>
+
+<script>
+  import wepy from 'wepy'
+  import {service} from '../api/api'
+  import base from '../mixins/base'
+  import http from '../mixins/http'
+  import Modal from '../components/modal'
+
+  export default class Index extends wepy.page {
+    mixins = [base, http]
+    config = {
+      navigationBarTitleText: '更多'
+    }
+
+    data = {
+      archivesList: [],
+      modalVisible: false,
+      showCancel: false,
+      modalImg: '',
+      modalDes: ''
+    }
+
+    methods = {
+      contact(name, description, img, path, tags, gameId) {
+        let self = this
+        this.modalVisible = true
+        this.modalImg = img
+        this.modalDes = description
+        wepy.getStorage({
+          key: 'session',
+          success (res) {
+            let sessionId = res.data
+            self.$post({url: service.contact, data: {name, description, img, path, sessionId, tags, gameId}}, {})
+          }
+        })
+      }
+    }
+
+    components = {
+      Modal
+    }
+
+    onLoad() {
+      this.initData()
+    }
+
+    initData() {
+      this.$get({url: service.moreGame}, {
+        success: ({code, data}) => {
+          this.archivesList = data.archivesList.archivesList
+        }
+      })
+    }
+  }
+</script>
