@@ -25,6 +25,9 @@ export const service = {
   //更多
   moreGame: `${host}/wxapp.index/moreGame`,
 
+  //tab 热门
+  hot: `${host}/wxapp.index/hot`,
+
   //搜索
   search: `${host}/wxapp.search/index`,
 
@@ -33,6 +36,9 @@ export const service = {
 
   //客服
   contact: `${host}/wxapp.common/responseMsg`,
+
+  //prev
+  prev: `${host}/wxapp.common/getCoverList`,
 
   // 主域
   host

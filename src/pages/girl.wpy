@@ -6,7 +6,7 @@
 </style>
 
 <template>
-  <view class="container">
+  <scroll-view scroll-x="false" scroll-y="true" class="container">
     <view class="game-list">
       <repeat for="{{archivesList}}" key="index" index="index" item="item">
         <view  class="game-item"  @tap="contact({{item.title}}, {{item.description}}, {{item.image}}, {{item.diyname}}, {{item.tags}}, {{item.id}})">
@@ -24,7 +24,7 @@
         </view>
       </repeat>
     </view>
-  </view>
+  </scroll-view>
 
   <Modal :visible.sync="modalVisible" :img.sync="modalImg" :showCancel.sync="showCancel">
     <view slot="body">{{modalDes}}</view>

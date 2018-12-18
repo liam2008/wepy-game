@@ -34,7 +34,7 @@
 </style>
 
 <template>
-  <view class="container">
+  <scroll-view scroll-x="false" scroll-y="true" class="container">
     <view class="search-container">
       <input id="search"
              value="{{searchContent}}"
@@ -62,7 +62,7 @@
         </view>
       </repeat>
     </view>
-  </view>
+  </scroll-view>
 
   <Modal :visible.sync="modalVisible" :img.sync="modalImg" :showCancel.sync="showCancel">
     <view slot="body">{{modalDes}}</view>

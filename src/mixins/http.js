@@ -49,7 +49,7 @@ export default class httpMixin extends wepy.mixin {
     }
 
     // 控制台调试日志
-    console.table(request)
+    // console.table(request)
 
     // 发起请求
     wepy.request(Object.assign(request, {

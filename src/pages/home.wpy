@@ -31,6 +31,7 @@
     }
   }
 
+
   .swiper-container {
     position: relative;
     z-index: 1;
@@ -130,7 +131,7 @@
 </style>
 
 <template>
-  <view class="container">
+  <scroll-view scroll-x="false" scroll-y="true" class="container">
     <view style="position:relative;">
       <view class="swing-container" @tap="collect">
         <image model="aspectFit" src="../images/category/game.png" class="swing-icon"></image>
@@ -138,7 +139,7 @@
       <swiper class="swiper-container" autoplay="true">
         <repeat for="{{bannerList}}" key="index" index="index" item="item">
           <swiper-item class="pr"
-                       @tap="contact('{{item.title}}','{{item.description}}','{{item.image}}','{{item.diyname}}', '{{item.tags}}','{{item.id}}')">
+                       @tap="contact('{{item.title}}','{{item.description}}','{{item.image}}','{{item.diyname}}', '','','{{item.qr}}')">
             <image src="{{item.image}}" class="slide-image"/>
           </swiper-item>
         </repeat>
@@ -158,7 +159,7 @@
         <view class="section-content">
           <repeat for="{{showLasts}}" key="index" index="index" item="item">
             <view class="section-item"
-                  @tap="contact('{{item.title}}','{{item.description}}','{{item.img}}','{{item.diyname}}','{{item.tags}}','{{item.game_id}}')">
+                  @tap="contact('{{item.title}}','{{item.description}}','{{item.img}}','{{item.diyname}}','{{item.tags}}','{{item.game_id}}','')">
               <image class="item-img" src="{{item.img}}"></image>
               <text class="h5">{{item.title}}</text>
             </view>
@@ -177,7 +178,7 @@
       <view class="section-content">
         <repeat for="{{popularList}}" key="index" index="index" item="item">
           <view class="section-item"
-                @tap="contact('{{item.title}}','{{item.description}}','{{item.image}}','{{item.diyname}}','{{item.tags}}','{{item.id}}')">
+                @tap="contact('{{item.title}}','{{item.description}}','{{item.image}}','{{item.diyname}}','{{item.tags}}','{{item.id}}','')">
             <view>
               <image class="item-img" src="{{item.image}}"></image>
               <text class="h5">{{item.title}}</text>
@@ -195,9 +196,9 @@
         <text class="section-title">最新游戏</text>
       </view>
       <view class="game-list">
-        <repeat for="{{archivesList}}" key="index" index="index" item="item">
+        <repeat for="{{news}}" key="index" index="index" item="item">
           <view class="game-item"
-                @tap="contact({{item.title}}, {{item.description}}, {{item.image}}, {{item.diyname}}, {{item.tags}}, {{item.id}})">
+                @tap="contact({{item.title}}, {{item.description}}, {{item.image}}, {{item.diyname}}, {{item.tags}}, {{item.id}}, '')">
             <image mode="aspectFill" src="{{item.image}}"></image>
             <view class="game-content">
               <view class="game-title">
@@ -219,13 +220,10 @@
       <text>分享</text>
     </button>
 
-
-  </view>
-
-  <view class="footer-container">
-    更多游戏请关注公众号【53游戏】
-  </view>
-
+    <view class="footer-container">
+      更多游戏请关注公众号【53游戏】
+    </view>
+  </scroll-view>
   <view class="modal {{isShow?'show':' '}}" @tap="collect">
     <view class="modal-content">
       <image class="point" mode="aspectFit" src="../images/icon/point.png"></image>
@@ -241,7 +239,6 @@
   <Modal :visible.sync="modalVisible" :img.sync="modalImg" :showCancel.sync="showCancel">
     <view slot="body">{{modalDes}}</view>
   </Modal>
-
 </template>
 
 <script>
@@ -294,17 +291,17 @@
           withShareTicket: true
         })
       },
-      contact(name, description, img, path, tags, gameId) {
+      contact(name, description, img, path, tags, gameId, qr) {
         let self = this
         this.modalVisible = true
         this.modalImg = img
         this.modalDes = description
-        console.log('modal', this.modalImg)
+        console.log(name, description, img, path, tags, gameId, qr)
         wepy.getStorage({
           key: 'session',
           success(res) {
             let sessionId = res.data
-            self.$post({url: service.contact, data: {name, description, img, path, sessionId, tags, gameId}}, {
+            self.$post({url: service.contact, data: {name, description, img, path, sessionId, tags, gameId, qr}}, {
               complete: (res) => {
                 if (res.data.code === 1) {
                 }
@@ -324,20 +321,7 @@
     }
 
     onLoad() {
-      //判断是否屏蔽
-      let self = this
-      this.$get({url: service.isOpen}, {
-        complete(res) {
-          let newVersion = res.data.data
-          let oldVersion = self.$parent.globalData.version
-
-          if (newVersion === oldVersion) {
-            wepy.navigateTo({url: '/pages/unauthorize'})
-          } else {
-            self.login()
-          }
-        }
-      })
+      this.login()
     }
 
     onShow() {
@@ -398,9 +382,10 @@
 
     login() {
       let self = this
+      let versionId = this.$parent.globalData.versionId
       this.$login((res) => {
         if (res.code) {
-          self.$post({url: service.login, data: {code: res.code}}, {
+          self.$post({url: service.login, data: {code: res.code, versionId}}, {
             success: ({code, data}) => {
               let session = data.sessionId
               self.initData()

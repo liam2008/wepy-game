@@ -164,9 +164,9 @@
                       open-type="contact"
                       contact="contact"
                      session-from="weapp">
-                     进入后台回复 <text class="red">1</text>
+                     点击进入后回复<text class="red">1</text>
               </button>
-              <view class="h-modal-footer-des">即将开始游戏</view>
+              <view class="h-modal-footer-des">即可开始游戏</view>
             </view>
           </view>
         </view>

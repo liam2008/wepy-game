@@ -1,12 +1,14 @@
 <style lang="less">
-    @import "./styles/weui/style/weui.less";
-    @import "./styles/custom/index.less";
-    @import "./styles/icon/iconfont.less";
+  @import "./styles/weui/style/weui.less";
+  @import "./styles/custom/index.less";
+  @import "./styles/icon/iconfont.less";
 </style>
 
 <script>
   import wepy from 'wepy'
-  // import 'wepy-async-function'
+  import 'wepy-async-function'
+
+  import {service} from './api/api'
 
   import {setStore} from 'wepy-redux'
   import configStore from './store'
@@ -17,13 +19,13 @@
   export default class extends wepy.app {
     config = {
       pages: [
+        'pages/unauthorize',
         'pages/home',
         'pages/hot',
         'pages/girl',
         'pages/service',
         'pages/more',
         'pages/authorize',
-        'pages/unauthorize',
         'pages/search'
       ],
       window: {
@@ -78,7 +80,8 @@
     }
 
     globalData = {
-      version: '1.1.1'
+      version: '1.0.3',
+      versionId: 2
     }
 
     constructor() {
@@ -87,16 +90,44 @@
     }
 
     onLaunch() {
-
+      // let self = this
+      //判断是否屏蔽
+      // wepy.request({
+      //   url: service.isOpen,
+      //   success: function (res) {
+      //     console.log('xxxxxxxxxxxxx')
+      //     let newVersion = res.data.data
+      //     let oldVersion = self.globalData.version
+      //     console.log('xxxxxxxxxxxxxxxx', newVersion !== oldVersion)
+      //     if (newVersion !== oldVersion) {
+      //       wepy.reLaunch({url: '/pages/home'})
+      //     } else {
+      //       wepy.reLaunch({url: '/pages/unauthorize/unauthorize'})
+      //     }
+      //   }
+      // })
+      // this.$get({url: service.isOpen}, {
+      //   complete(res) {
+      //     let newVersion = res.data.data
+      //     let oldVersion = self.$parent.globalData.version
+      //     if (newVersion === oldVersion) {
+      //       wepy.reLaunch({url: '/pages/unauthorize'})
+      //     } else {
+      //       wepy.reLaunch({url: '/pages/home'})
+      //     }
+      //   }
+      // })
     }
 
     /* ============= 工具方法（app没法用mixins，就再写一遍了） ============= */
     isObject(item) {
       return typeof item === 'object' && !this.isArray(item)
     }
+
     isArray(item) {
       return Object.prototype.toString.apply(item) === '[object Array]'
     }
+
     isUndefined(item) {
       return typeof item === 'undefined'
     }

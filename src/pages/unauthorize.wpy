@@ -1,27 +1,28 @@
 <style lang="less">
   @import "../styles/custom/fn.less";
-  page{
+
+  page {
     background: #fff;
   }
-  .img-list{
-    padding:@dl;
-    display:flex;
+
+  .img-list {
+    padding: @dl;
+    display: flex;
     flex-direction: column;
     justify-content: space-between;
-    .img{
+    .img {
       width: 100%;
       height: 300rpx;
-      border-radius:30rpx;
+      border-radius: 30rpx;
       overflow: hidden;
       margin-bottom: @dl;
     }
-    image{
+    image {
       width: 100%;
     }
   }
 
-  .footer-container{
-    margin-top: 380rpx;
+  .footer-container {
     background-color: white !important;
   }
 
@@ -29,16 +30,12 @@
 
 <template>
   <view class="container">
-    <view class="img-list">
-      <navigator class="img" app-id="wx79ade44c39cefc7f" path="?chid=2041&subchid=hzcqll" target="miniProgram">
-        <image mode="aspectFill" src="http://www.53fun.com/Uploads/Picture/2018-11-13/5bea93ffa6f76.gif"></image>
-      </navigator>
 
-      <navigator class="img" app-id="wx79ade44c39cefc7f" path="?chid=2041&subchid=hzcqll">
-        <image mode="aspectFill" src="http://www.53fun.com/Uploads/Picture/2018-11-13/5bea93ffa6f76.gif"></image>
-      </navigator>
+    <view class='img-list'>
+      <repeat for="{{imgList}}" key="index" index="index" item="img">
+        <image class='img' src='{{img}}' data-key="{{index}}" data-src="{{img}}" @tap="previewImage"></image>
+      </repeat>
     </view>
-
     <view class="footer-container">
       更多游戏请关注公众号【53游戏】
     </view>
@@ -47,32 +44,72 @@
 
 <script>
   import wepy from 'wepy'
+  import {service} from '../api/api'
+  import base from '../mixins/base'
+  import http from '../mixins/http'
 
   export default class Index extends wepy.page {
-    mixins = []
+    mixins = [base, http]
     config = {
-      navigationBarTitleText: '预览'
+      navigationBarTitleText: ''
     }
 
     data = {
-
+      imgList: [],
+      preList: []
     }
 
-    computed = {
-    }
+    computed = {}
 
     methods = {
-
+      previewImage(e) {
+        let current = e.target.dataset.src
+        let key = e.target.dataset.key
+        let BeforePre = this.preList.slice(0, key)
+        let afterPre = this.preList.slice(key)
+        let preList = [].concat(afterPre, BeforePre)
+        wepy.previewImage({
+          current: current, // 当前显示图片的http链接
+          urls: preList// 需要预览的图片http链接列表
+        })
+      }
     }
 
-    events = {
-    }
+    events = {}
 
     components = {
       // BookList
     }
 
     onLoad() {
+      this.initData()
+      let self = this
+      //判断是否屏蔽
+      this.$get({url: service.isOpen}, {
+        complete(res) {
+          let newVersion = res.data.data
+          let oldVersion = self.$parent.globalData.version
+          if (newVersion !== oldVersion) {
+            wepy.reLaunch({url: '/pages/home'})
+          }
+        }
+      })
+    }
+
+    initData() {
+      this.$get({url: service.prev}, {
+        success: ({code, data}) => {
+          let coverList = data.CoverList
+          let preList = []
+          let imgList = []
+          coverList.forEach((v, k) => {
+            preList[k] = v.qr
+            imgList[k] = v.image
+          })
+          this.preList = preList
+          this.imgList = imgList
+        }
+      })
     }
   }
 </script>

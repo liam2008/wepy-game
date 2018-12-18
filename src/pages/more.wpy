@@ -25,15 +25,15 @@
 </style>
 
 <template>
-  <view class="container">
+  <scroll-view scroll-x="false" scroll-y="true" class="container">
     <view class="more-list">
       <repeat for="{{archivesList}}" key="index" index="index" item="item">
-        <view class="more-item"  @tap="contact({{item.title}}, {{item.description}}, {{item.image}}, {{item.diyname}}, {{item.tags}}, {{item.id}})">
+        <view class="more-item"  @tap="contact({{item.title}}, {{item.description}}, {{item.image}}, {{item.diyname}}, {{item.tags}}, {{item.id}}, {{item.qr}})">
           <image mode="aspectFill" src="{{item.image}}"></image>
         </view>
       </repeat>
     </view>
-  </view>
+  </scroll-view>
 
 
   <Modal :visible.sync="modalVisible" :img.sync="modalImg" :showCancel.sync="showCancel">
@@ -63,7 +63,7 @@
     }
 
     methods = {
-      contact(name, description, img, path, tags, gameId) {
+      contact(name, description, img, path, tags, gameId, qr) {
         let self = this
         this.modalVisible = true
         this.modalImg = img
@@ -72,7 +72,7 @@
           key: 'session',
           success (res) {
             let sessionId = res.data
-            self.$post({url: service.contact, data: {name, description, img, path, sessionId, tags, gameId}}, {})
+            self.$post({url: service.contact, data: {name, description, img, path, sessionId, tags, gameId, qr}}, {})
           }
         })
       }
